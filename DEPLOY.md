@@ -45,6 +45,41 @@ Browser ──► Vercel (static frontend  ──/api──►  Python function 
    `BLOB_CSV_URL` is **not required** — the backend discovers the newest blob
    via the Vercel Blob `list` API.
 
+## Alternative: save edits straight to the CSV in GitHub
+
+Instead of Blob, the deployed app can commit every reassignment to
+`data/grid_assignments.csv` in this repository (`backend/github_store.py`). A
+Vercel function can't write to its own files, so it goes through the GitHub API.
+
+1. Create a **fine-grained personal access token** (GitHub → Settings →
+   Developer settings → Fine-grained tokens) limited to this repository with
+   **Contents: Read and write**.
+2. In Vercel → Settings → Environment Variables set:
+
+   | Variable | Value |
+   |---|---|
+   | `DATA_BACKEND` | `github` |
+   | `GITHUB_TOKEN` | the token (tick "Sensitive") |
+   | `GITHUB_REPO` | optional, `owner/name`; defaults to the repo Vercel deploys from |
+   | `GITHUB_BRANCH` | optional, defaults to `main` |
+
+3. Redeploy. `GET /api/health` → `{"status":"ok","db":"github"}`.
+
+What to expect:
+
+- Each save is one commit on `main`, e.g. `Reassign ab_mtr_1 to LB (2026_04_23)
+  [skip ci]`, authored by the token's owner. `[skip ci]` skips GitHub Actions,
+  and `ignoreCommand` in `vercel.json` skips the Vercel rebuild for commits that
+  only touch `data/`.
+- Run `git pull` before working locally — `main` moves whenever someone saves.
+- If two people save at the same moment, the second save is re-applied on top
+  of the first rather than overwriting it.
+- The edits already made in Blob are **not** in the repo's CSV. Download the
+  current blob and commit it over `data/grid_assignments.csv` before switching,
+  or those edits are left behind.
+- A branch protection rule that requires pull requests on `main` will reject
+  these commits.
+
 ## Deploy
 
 ```bash

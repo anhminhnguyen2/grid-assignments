@@ -23,7 +23,9 @@ frontend/playwright-report/
 
 # CSV Data (sensitive operational data — distribute separately)
 # grid_assignments.csv
+documentation.md
 
 # macOS
 .DS_Store
 .vercel
+data/grid_assignmentsOLD.csv
