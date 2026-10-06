@@ -10,8 +10,8 @@ test('app loads with header and both tabs', async ({ page }) => {
 test('grid map tab shows scenario selector populated from the API', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByText('Substation Meter')).toBeVisible();
-  // The scenario <select> is populated from /api/scenarios (4 scenarios).
-  await expect(page.locator('select').first().locator('option')).toHaveCount(4);
+  // The scenario <select> is populated from /api/scenarios (5 scenarios).
+  await expect(page.locator('select').first().locator('option')).toHaveCount(5);
 });
 
 test('low load / high pv tab renders charts', async ({ page }) => {
